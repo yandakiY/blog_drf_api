@@ -6,6 +6,7 @@ from . import views
 
 routers = routers.DefaultRouter()
 routers.register('categories' , views.CategoryViewSet)
+routers.register('articles' , views.ArticleViewSet)
 
 urlpatterns = [
     # path('admin/', admin.site.urls),

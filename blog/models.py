@@ -65,11 +65,27 @@ class Category(TitleSlugDescriptionModel , TimeStampedModel , ActivatorModel):
 
 class Article(TitleSlugDescriptionModel , TimeStampedModel , ActivatorModel , ModelId):
     
+    subtitle = models.CharField(max_length = 100 , blank = True , null = True)
     category = models.ForeignKey(Category , on_delete=models.CASCADE , default = 1 , null = False , blank = False)
     image_article = models.ImageField(upload_to='media/', default='' , blank=True , null=True)
-    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , default = 1)
     like = models.PositiveBigIntegerField(default = 0)
+
+    @property
+    def img(self):
+        if self.image_article == '':
+            self.image_article = ''
+        
+        return self.image_article
     
+    
+    class Meta:
+        ordering = ['-created']
+
+class ImageArticle(models.Model):
+    
+    article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'images')
+    image = models.ImageField(upload_to='media/', default='' , blank=True , null=True)
     
 
 class Comments(TimeStampedModel , ActivatorModel , ModelId):
