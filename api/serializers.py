@@ -93,3 +93,36 @@ class ArticleCreateSerializer(ModelSerializer):
         for img in images:
             ImageArticle.objects.create(image = img , article = article_created)
         return article_created
+    
+    
+class CommentsSerializer(ModelSerializer):
+    
+    user_author = UserCreateSerializer()
+    article = ArticleCreateSerializer()
+    class Meta:
+        model = Comments
+        fields = [
+            'id',
+            'comment',
+            'article',
+            'user_author'
+        ]
+        
+        
+class CommentsCreateSerializer(ModelSerializer):
+    
+    class Meta:
+        model = Comments
+        fields = [
+            'comment'
+        ]
+        
+    def create(self, validated_data):
+        
+        user_id = self.context['user_id']
+        article_pk = self.context['article_id']
+        comment = self.validated_data.get('comment')
+        
+        my_comment = Comments.objects.create(user_author_id = user_id , article_id = article_pk , comment = comment)
+        return my_comment
+        # return super().create(validated_data)
