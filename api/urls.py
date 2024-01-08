@@ -13,6 +13,7 @@ articles_router = routers.NestedDefaultRouter(router , 'articles' , lookup='arti
 
 articles_router.register('comments' , views.CommentsViewSet , basename='article-comments')
 articles_router.register('like' , views.LikeArticleViewSet , basename='like-article')
+articles_router.register('dislike' , views.DislikeArticleViewSet , basename='dislike-article')
 
 urlpatterns = [
     # path('admin/', admin.site.urls),

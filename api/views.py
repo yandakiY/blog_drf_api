@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from blog.models import Category , Article , Comments , UserBlog , LikeArticle
-from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer
+from blog.models import Category , Article , Comments , UserBlog , LikeArticle , DislikeArticle
+from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer, DisLikeArticleSerializer , DisLikeAnArticleSerializer
 
 # Create your views here.
 
@@ -78,6 +78,27 @@ class LikeArticleViewSet(ModelViewSet):
             return LikeAnArticleSerializer
         
         return LikeArticleSerializer
+    
+    def get_serializer_context(self):
+        return {
+            'user_id': self.request.user.id,
+            'article_id': self.kwargs['article_pk']
+        }
+        
+
+class DislikeArticleViewSet(ModelViewSet):
+    
+    queryset = DislikeArticle.objects.all()
+    
+    def get_serializer_class(self):
+        
+        if self.request.method == 'GET':
+            return DisLikeArticleSerializer
+        
+        if self.request.method == 'POST':
+            return DisLikeAnArticleSerializer
+        
+        return DisLikeArticleSerializer
     
     def get_serializer_context(self):
         return {

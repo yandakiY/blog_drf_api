@@ -1,4 +1,4 @@
-from blog.models import Category , UserBlog , Article , Comments , ImageArticle,LikeArticle
+from blog.models import Category , UserBlog , Article , Comments , ImageArticle,LikeArticle , DislikeArticle
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
@@ -129,7 +129,7 @@ class CommentsCreateSerializer(ModelSerializer):
         
 
 
-class ArticleLikedSerializer(ModelSerializer):
+class ArticleDisOrLikedSerializer(ModelSerializer):
     user_author = UserCreateSerializer()
     category = CategoryCreateSerializer()
     # images = ArticleImageSerializer(many=True)
@@ -151,7 +151,7 @@ class ArticleLikedSerializer(ModelSerializer):
 class LikeArticleSerializer(ModelSerializer):
     
     user_author = UserCreateSerializer(read_only = True)
-    article = ArticleLikedSerializer(many = False)
+    article = ArticleDisOrLikedSerializer(many = False)
     class Meta:
         model = LikeArticle
         fields = ['id','user_author' , 'article']
@@ -186,3 +186,63 @@ class LikeAnArticleSerializer(ModelSerializer):
         like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
         
         return like_article
+    
+    
+class DisLikeArticleSerializer(ModelSerializer):
+    
+    user_author = UserCreateSerializer(read_only = True)
+    article = ArticleDisOrLikedSerializer(many = False)
+    class Meta:
+        model = DislikeArticle
+        fields = ['id','user_author','article']
+        
+        
+class DisLikeAnArticleSerializer(ModelSerializer):
+    
+    user_author = UserCreateSerializer(read_only = True)
+    class Meta:
+        model = LikeArticle
+        fields = [
+            'user_author'
+        ]
+        
+        
+    def create(self, validated_data):
+        
+        # print('Article id' , self.context.get('article_id'))
+        
+        # Add new feature, no like for the same article of an the same user
+        if DislikeArticle.objects.filter(user_author_id = self.context['user_id'] , article_id = self.context['article_id']).exists():
+            raise serializers.ValidationError("This user has already liked this article !!")
+        
+        
+        
+        # get article via context
+        article_selected = Article.objects.get(id = self.context['article_id'])
+        article_selected.like -= 1
+        
+        if article_selected.like < 0:
+            article_selected.like = 0
+            
+        article_selected.save()
+        
+        # Delete LikeArticle which correspond to article_id and user_id
+        # if LikeArticle exists delete this and create new DislikeArticle and de
+        # else Create a DislikeArticle
+        
+        dislike_article = None
+        
+        if LikeArticle.objects.filter(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id')).exists():
+            # deleting the LikeArticle
+            like_article = LikeArticle.objects.filter(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
+            like_article.delete()
+            
+            # create an DislikeArticle
+            dislike_article = DislikeArticle.objects.create(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
+        else:
+            dislike_article = DislikeArticle.objects.create(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
+        
+        # create an like_article
+        # like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
+        
+        return dislike_article
