@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from blog.models import Category , Article , Comments , UserBlog
-from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer
+from blog.models import Category , Article , Comments , UserBlog , LikeArticle
+from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer
 
 # Create your views here.
 
@@ -41,7 +41,7 @@ class CommentsViewSet(ModelViewSet):
     
     def get_queryset(self):
         # user_id = self.request.user.id
-        return Comments.objects.all()
+        return Comments.objects.filter(article_id = self.kwargs['article_pk'])
     
     
     def get_serializer_class(self):
@@ -64,3 +64,23 @@ class CommentsViewSet(ModelViewSet):
             'article_id': self.kwargs['article_pk']
         }
         
+        
+class LikeArticleViewSet(ModelViewSet):
+    
+    queryset = LikeArticle.objects.all()
+    
+    def get_serializer_class(self):
+        
+        if self.request.method == 'GET':
+            return LikeArticleSerializer
+        
+        if self.request.method == 'POST':
+            return LikeAnArticleSerializer
+        
+        return LikeArticleSerializer
+    
+    def get_serializer_context(self):
+        return {
+            'user_id': self.request.user.id,
+            'article_id': self.kwargs['article_pk']
+        }

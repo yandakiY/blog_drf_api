@@ -1,4 +1,4 @@
-from blog.models import Category , UserBlog , Article , Comments , ImageArticle
+from blog.models import Category , UserBlog , Article , Comments , ImageArticle,LikeArticle
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
@@ -125,4 +125,61 @@ class CommentsCreateSerializer(ModelSerializer):
         
         my_comment = Comments.objects.create(user_author_id = user_id , article_id = article_pk , comment = comment)
         return my_comment
+        # return super().create(validated_data)
+        
+
+
+class ArticleLikedSerializer(ModelSerializer):
+    user_author = UserCreateSerializer()
+    category = CategoryCreateSerializer()
+    # images = ArticleImageSerializer(many=True)
+    
+    class Meta:
+        model = Article
+        fields = [
+            'id',
+            'title',
+            'slug',
+            'subtitle',
+            'created',
+            'like',
+            'user_author',
+            'category',
+        ]
+        
+
+class LikeArticleSerializer(ModelSerializer):
+    
+    user_author = UserCreateSerializer(read_only = True)
+    article = ArticleLikedSerializer(many = False)
+    class Meta:
+        model = LikeArticle
+        fields = ['user_author' , 'article']
+        
+        
+class LikeAnArticleSerializer(ModelSerializer):
+    
+    user_author = UserCreateSerializer(read_only = True)
+    class Meta:
+        model = LikeArticle
+        fields = [
+            'user_author'
+        ]
+        
+        
+    def create(self, validated_data):
+        
+        print('Article id' , self.context.get('article_id'))
+        
+        # Add new feature, no like for the same article of an the same user
+        
+        # get article via context
+        article_selected = Article.objects.get(id = self.context['article_id'])
+        article_selected.like += 1
+        article_selected.save()
+        
+        # create an like_article
+        like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
+        
+        return like_article
         # return super().create(validated_data)

@@ -78,6 +78,19 @@ class Article(TitleSlugDescriptionModel , TimeStampedModel , ActivatorModel , Mo
         
         return self.image_article
     
+    # def like(self):
+    #     self.like += 1
+    #     self.save()
+        
+    
+    # def unlike(self):
+    #     self.like -= 1
+        
+    #     if self.like < 0:
+    #         self.like = 0
+        
+    #     self.save()
+    
     
     class Meta:
         ordering = ['-created']
@@ -86,7 +99,14 @@ class ImageArticle(models.Model):
     
     article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'images')
     image = models.ImageField(upload_to='media/', default='' , blank=True , null=True)
+
+
+class LikeArticle(models.Model):
     
+    article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'likes_article')
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+
+  
 
 class Comments(TimeStampedModel , ActivatorModel , ModelId):
     
