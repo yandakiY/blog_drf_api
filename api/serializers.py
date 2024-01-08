@@ -183,7 +183,21 @@ class LikeAnArticleSerializer(ModelSerializer):
         article_selected.save()
         
         # create an like_article
-        like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
+        like_article = None
+        
+        # if Dislike of user for this article exists, delete Dislike Article
+        # create new LikeArticle
+        # else make nothing, just create LikeArticle
+        
+        if DislikeArticle.objects.filter(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id')).exists():
+            # deleting the LikeArticle
+            dislike_article = DislikeArticle.objects.filter(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
+            dislike_article.delete()
+            
+            # create an DislikeArticle
+            like_article = LikeArticle.objects.create(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
+        else:
+            like_article = LikeArticle.objects.create(user_author_id = self.context.get('user_id') , article_id = self.context.get('article_id'))
         
         return like_article
     
@@ -246,3 +260,23 @@ class DisLikeAnArticleSerializer(ModelSerializer):
         # like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
         
         return dislike_article
+    
+
+class LikeOfUserSerializer(ModelSerializer):
+    
+    email = serializers.EmailField(read_only=True)
+    my_likes = LikeArticleSerializer(many=True , read_only=True)
+    class Meta:
+        model = UserBlog
+        fields = [
+            'id',
+            'email',
+            'my_likes'
+        ]
+        
+    
+    def create(self, validated_data):
+        raise serializers.ValidationError('Cannot create like user like that')
+        
+    
+    

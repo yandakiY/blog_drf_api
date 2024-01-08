@@ -7,6 +7,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register('categories' , views.CategoryViewSet)
 router.register('articles' , views.ArticleViewSet)
+router.register('likes' , views.LikeUserViewSet , basename='LikeUser')
 
 
 articles_router = routers.NestedDefaultRouter(router , 'articles' , lookup='article')

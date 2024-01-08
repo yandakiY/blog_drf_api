@@ -68,7 +68,7 @@ class Article(TitleSlugDescriptionModel , TimeStampedModel , ActivatorModel , Mo
     subtitle = models.CharField(max_length = 100 , blank = True , null = True)
     category = models.ForeignKey(Category , on_delete=models.CASCADE , default = 1 , null = False , blank = False)
     image_article = models.ImageField(upload_to='media/', default='' , blank=True , null=True)
-    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , default = 1)
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , default = 1 , related_name = 'my_articles')
     like = models.PositiveBigIntegerField(default = 0)
 
     @property
@@ -78,11 +78,6 @@ class Article(TitleSlugDescriptionModel , TimeStampedModel , ActivatorModel , Mo
         
         return self.image_article
     
-    # @property
-    # def like(self):
-    #     if self.like < 0:
-    #         self.like = 0
-    #     return self.like
     
     class Meta:
         ordering = ['-created']
@@ -96,17 +91,17 @@ class ImageArticle(models.Model):
 class LikeArticle(models.Model):
     
     article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'likes_article')
-    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , related_name = 'my_likes')
 
 
 class DislikeArticle(models.Model):
     
     article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'dislikes_article')
-    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , related_name = 'my_dislikes')
   
 
 class Comments(TimeStampedModel , ActivatorModel , ModelId):
     
-    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE)
+    user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , related_name = 'my_comments')
     article = models.ForeignKey(Article , on_delete=models.CASCADE , null = True , blank = True)
     comment = models.TextField(null = False , blank = False)

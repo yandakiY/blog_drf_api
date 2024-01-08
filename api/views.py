@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from blog.models import Category , Article , Comments , UserBlog , LikeArticle , DislikeArticle
-from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer, DisLikeArticleSerializer , DisLikeAnArticleSerializer
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from blog.models import Category , Article , Comments , UserBlog , LikeArticle , DislikeArticle, UserBlog
+from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer, DisLikeArticleSerializer , DisLikeAnArticleSerializer , LikeOfUserSerializer
 
 # Create your views here.
 
@@ -41,6 +42,7 @@ class CommentsViewSet(ModelViewSet):
     
     def get_queryset(self):
         # user_id = self.request.user.id
+        
         return Comments.objects.filter(article_id = self.kwargs['article_pk'])
     
     
@@ -104,4 +106,20 @@ class DislikeArticleViewSet(ModelViewSet):
         return {
             'user_id': self.request.user.id,
             'article_id': self.kwargs['article_pk']
+        }
+        
+
+class LikeUserViewSet(ModelViewSet):
+    
+    # queryset = UserBlog.my_likes.all()
+    
+    def get_queryset(self):
+        return UserBlog.objects.filter(id = self.request.user.id)   
+    
+    def get_serializer_class(self):
+        return LikeOfUserSerializer
+    
+    def get_serializer_context(self):
+        return {
+            'user_id': self.request.user.id
         }
