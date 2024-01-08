@@ -154,7 +154,7 @@ class LikeArticleSerializer(ModelSerializer):
     article = ArticleLikedSerializer(many = False)
     class Meta:
         model = LikeArticle
-        fields = ['user_author' , 'article']
+        fields = ['id','user_author' , 'article']
         
         
 class LikeAnArticleSerializer(ModelSerializer):
@@ -169,9 +169,13 @@ class LikeAnArticleSerializer(ModelSerializer):
         
     def create(self, validated_data):
         
-        print('Article id' , self.context.get('article_id'))
+        # print('Article id' , self.context.get('article_id'))
         
         # Add new feature, no like for the same article of an the same user
+        # def validate_user_author(self , value):
+        if LikeArticle.objects.filter(user_author_id = self.context['user_id'] , article_id = self.context['article_id']).exists():
+            raise serializers.ValidationError("This user has already liked this article !!")
+        
         
         # get article via context
         article_selected = Article.objects.get(id = self.context['article_id'])
@@ -182,4 +186,3 @@ class LikeAnArticleSerializer(ModelSerializer):
         like_article = LikeArticle.objects.create(article_id = self.context['article_id'] , user_author_id = self.context['user_id'])
         
         return like_article
-        # return super().create(validated_data)
