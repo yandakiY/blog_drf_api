@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from blog.models import Category , Article , Comments , UserBlog , LikeArticle , DislikeArticle, UserBlog
-from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer, DisLikeArticleSerializer , DisLikeAnArticleSerializer , LikeOfUserSerializer
+from .serializers import CategorySerializer , CategoryCreateSerializer , ArticleSerializer , ArticleCreateSerializer , CommentsSerializer , CommentsCreateSerializer , LikeArticleSerializer ,LikeAnArticleSerializer, DisLikeArticleSerializer , DisLikeAnArticleSerializer , LikeOfUserSerializer, DislikeOfUserSerializer
 
 # Create your views here.
 
@@ -111,13 +111,25 @@ class DislikeArticleViewSet(ModelViewSet):
 
 class LikeUserViewSet(ModelViewSet):
     
-    # queryset = UserBlog.my_likes.all()
-    
     def get_queryset(self):
         return UserBlog.objects.filter(id = self.request.user.id)   
     
     def get_serializer_class(self):
         return LikeOfUserSerializer
+    
+    def get_serializer_context(self):
+        return {
+            'user_id': self.request.user.id
+        }
+        
+        
+class DislikeUserViewSet(ModelViewSet):
+    
+    def get_queryset(self):
+        return UserBlog.objects.filter(id = self.request.user.id)   
+    
+    def get_serializer_class(self):
+        return DislikeOfUserSerializer
     
     def get_serializer_context(self):
         return {

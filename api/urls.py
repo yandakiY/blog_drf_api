@@ -8,10 +8,10 @@ router = routers.DefaultRouter()
 router.register('categories' , views.CategoryViewSet)
 router.register('articles' , views.ArticleViewSet)
 router.register('likes' , views.LikeUserViewSet , basename='LikeUser')
+router.register('dislikes' , views.DislikeUserViewSet , basename='DislikeUser')
 
 
 articles_router = routers.NestedDefaultRouter(router , 'articles' , lookup='article')
-
 articles_router.register('comments' , views.CommentsViewSet , basename='article-comments')
 articles_router.register('like' , views.LikeArticleViewSet , basename='like-article')
 articles_router.register('dislike' , views.DislikeArticleViewSet , basename='dislike-article')

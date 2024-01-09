@@ -151,10 +151,10 @@ class ArticleDisOrLikedSerializer(ModelSerializer):
 class LikeArticleSerializer(ModelSerializer):
     
     user_author = UserCreateSerializer(read_only = True)
-    article = ArticleDisOrLikedSerializer(many = False)
+    # article = ArticleDisOrLikedSerializer(many = False)
     class Meta:
         model = LikeArticle
-        fields = ['id','user_author' , 'article']
+        fields = ['id','user_author']
         
         
 class LikeAnArticleSerializer(ModelSerializer):
@@ -205,10 +205,10 @@ class LikeAnArticleSerializer(ModelSerializer):
 class DisLikeArticleSerializer(ModelSerializer):
     
     user_author = UserCreateSerializer(read_only = True)
-    article = ArticleDisOrLikedSerializer(many = False)
+    # article = ArticleDisOrLikedSerializer(many = False)
     class Meta:
         model = DislikeArticle
-        fields = ['id','user_author','article']
+        fields = ['id','user_author']
         
         
 class DisLikeAnArticleSerializer(ModelSerializer):
@@ -272,6 +272,23 @@ class LikeOfUserSerializer(ModelSerializer):
             'id',
             'email',
             'my_likes'
+        ]
+        
+    
+    def create(self, validated_data):
+        raise serializers.ValidationError('Cannot create like user like that')
+    
+    
+class DislikeOfUserSerializer(ModelSerializer):
+    
+    email = serializers.EmailField(read_only=True)
+    my_dislikes = DisLikeArticleSerializer(many=True , read_only=True)
+    class Meta:
+        model = UserBlog
+        fields = [
+            'id',
+            'email',
+            'my_dislikes'
         ]
         
     
