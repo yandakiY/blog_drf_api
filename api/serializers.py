@@ -130,7 +130,7 @@ class CommentsCreateSerializer(ModelSerializer):
 
 
 class ArticleDisOrLikedSerializer(ModelSerializer):
-    user_author = UserCreateSerializer()
+    # user_author = UserCreateSerializer()
     category = CategoryCreateSerializer()
     # images = ArticleImageSerializer(many=True)
     
@@ -143,7 +143,6 @@ class ArticleDisOrLikedSerializer(ModelSerializer):
             'subtitle',
             'created',
             'like',
-            'user_author',
             'category',
         ]
         
@@ -151,10 +150,10 @@ class ArticleDisOrLikedSerializer(ModelSerializer):
 class LikeArticleSerializer(ModelSerializer):
     
     user_author = UserCreateSerializer(read_only = True)
-    # article = ArticleDisOrLikedSerializer(many = False)
+    article = ArticleDisOrLikedSerializer(many = False)
     class Meta:
         model = LikeArticle
-        fields = ['id','user_author']
+        fields = ['id','user_author','like_created','article']
         
         
 class LikeAnArticleSerializer(ModelSerializer):
@@ -205,10 +204,10 @@ class LikeAnArticleSerializer(ModelSerializer):
 class DisLikeArticleSerializer(ModelSerializer):
     
     user_author = UserCreateSerializer(read_only = True)
-    # article = ArticleDisOrLikedSerializer(many = False)
+    article = ArticleDisOrLikedSerializer(many = False)
     class Meta:
         model = DislikeArticle
-        fields = ['id','user_author']
+        fields = ['id','user_author','dislike_created','article']
         
         
 class DisLikeAnArticleSerializer(ModelSerializer):

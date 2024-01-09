@@ -90,12 +90,14 @@ class ImageArticle(models.Model):
 
 class LikeArticle(models.Model):
     
+    like_created = models.DateTimeField(blank = True , null = True)
     article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'likes_article')
     user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , related_name = 'my_likes')
 
 
 class DislikeArticle(models.Model):
     
+    dislike_created = models.DateTimeField(blank = True , null = True)
     article = models.ForeignKey(Article , on_delete=models.PROTECT , related_name = 'dislikes_article')
     user_author = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE , related_name = 'my_dislikes')
   
